@@ -3,7 +3,7 @@ use std::cmp::max;
 use regex::Regex;
 
 fn main() {
-    let ctx_lines = 3;
+    let ctx_lines = 2;
     let needle = Regex::new("picture").unwrap();
 
     let haystack = "\
@@ -25,7 +25,7 @@ through millions of pages?";
     let output_chunk = haystack
         .lines()
         .skip(start_index)
-        .take(2 * ctx_lines + 1)
+        .take(queried_idx - start_index + ctx_lines + 1)
         .enumerate()
         .map(|(idx, item)| {
             let line_num = idx + start_index + 1;
