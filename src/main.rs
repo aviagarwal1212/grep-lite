@@ -1,10 +1,23 @@
 use std::cmp::max;
 
+use clap::{arg, Parser};
 use regex::Regex;
 
+#[derive(Parser)]
+#[command(author, version, about)]
+struct Args {
+    /// Pattern to search in haystack
+    #[arg(short, long)]
+    pattern: String,
+    /// Number of rows to show for context in each direction
+    #[arg(short, long, default_value_t = 2)]
+    context: usize,
+}
+
 fn main() {
-    let ctx_lines = 2;
-    let needle = Regex::new("picture").unwrap();
+    let args = Args::parse();
+    let ctx_lines: usize = args.context;
+    let needle = Regex::new(&args.pattern).unwrap();
 
     let haystack = "\
 Every face, every shop, 
