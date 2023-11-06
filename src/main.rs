@@ -13,24 +13,30 @@ It is the same with books.
 What do we seek 
 through millions of pages?";
 
-    let lines = haystack.lines().enumerate().collect::<Vec<(usize, &str)>>();
+    let queried_idx = haystack
+        .lines()
+        .position(|line| needle.is_match(line))
+        .unwrap();
 
-    let chunk = lines
-        .windows(2 * ctx_lines + 1)
-        .find(|&chunk| needle.is_match(chunk[ctx_lines].1))
-        .unwrap_or_default();
+    let start_index = match queried_idx - ctx_lines {
+        0.. => queried_idx - ctx_lines,
+        _ => 0,
+    };
 
-    let output = chunk
-        .iter()
+    let output_chunk = haystack
+        .lines()
+        .skip(start_index)
+        .take(2 * ctx_lines + 1)
         .enumerate()
         .map(|(idx, item)| {
-            if idx == ctx_lines {
-                return format!("* {} {}", item.0, item.1);
+            let line_num = idx + start_index + 1;
+            if line_num == ctx_lines + 1 {
+                return format!("* {} {}", line_num, item);
             }
-            format!("  {} {}", item.0, item.1)
+            format!("  {} {}", line_num, item)
         })
         .collect::<Vec<_>>()
         .join("\n");
 
-    println!("{}", output);
+    println!("{}", output_chunk);
 }
