@@ -1,7 +1,7 @@
 use regex::Regex;
 
 fn main() {
-    let ctx_lines = 3;
+    let ctx_lines = 2;
     let needle = Regex::new("picture").unwrap();
 
     let haystack = "\
@@ -14,16 +14,23 @@ What do we seek
 through millions of pages?";
 
     let lines = haystack.lines().enumerate().collect::<Vec<(usize, &str)>>();
+
     let chunk = lines
         .windows(2 * ctx_lines + 1)
         .find(|&chunk| needle.is_match(chunk[ctx_lines].1))
         .unwrap_or_default();
 
-    for (i, item) in chunk.iter().enumerate() {
-        if i == ctx_lines {
-            println!("* {} {}", item.0, item.1);
-        } else {
-            println!("  {} {}", item.0, item.1);
-        }
-    }
+    let output = chunk
+        .iter()
+        .enumerate()
+        .map(|(idx, item)| {
+            if idx == ctx_lines {
+                return format!("* {} {}", item.0, item.1);
+            }
+            format!("  {} {}", item.0, item.1)
+        })
+        .collect::<Vec<_>>()
+        .join("\n");
+
+    println!("{}", output);
 }
