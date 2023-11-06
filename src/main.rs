@@ -1,7 +1,9 @@
+use std::cmp::max;
+
 use regex::Regex;
 
 fn main() {
-    let ctx_lines = 2;
+    let ctx_lines = 3;
     let needle = Regex::new("picture").unwrap();
 
     let haystack = "\
@@ -18,10 +20,7 @@ through millions of pages?";
         .position(|line| needle.is_match(line))
         .unwrap();
 
-    let start_index = match queried_idx - ctx_lines {
-        0.. => queried_idx - ctx_lines,
-        _ => 0,
-    };
+    let start_index = max(queried_idx as isize - ctx_lines as isize, 0) as usize;
 
     let output_chunk = haystack
         .lines()
@@ -30,7 +29,7 @@ through millions of pages?";
         .enumerate()
         .map(|(idx, item)| {
             let line_num = idx + start_index + 1;
-            if line_num == ctx_lines + 1 {
+            if line_num == queried_idx + 1 {
                 return format!("* {} {}", line_num, item);
             }
             format!("  {} {}", line_num, item)
