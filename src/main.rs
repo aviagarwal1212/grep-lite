@@ -1,6 +1,8 @@
+use regex::Regex;
+
 fn main() {
-    let ctx_lines = 2;
-    let needle = "oo";
+    let ctx_lines = 3;
+    let needle = Regex::new("picture").unwrap();
 
     let haystack = "\
 Every face, every shop, 
@@ -14,8 +16,8 @@ through millions of pages?";
     let lines = haystack.lines().enumerate().collect::<Vec<(usize, &str)>>();
     let chunk = lines
         .windows(2 * ctx_lines + 1)
-        .find(|&lines| lines[ctx_lines].1.contains(needle))
-        .unwrap();
+        .find(|&chunk| needle.is_match(chunk[ctx_lines].1))
+        .unwrap_or_default();
 
     for (i, item) in chunk.iter().enumerate() {
         if i == ctx_lines {
